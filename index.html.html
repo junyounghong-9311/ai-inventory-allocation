@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>초도 재고 배분 의사결정 지원 | AI 협업 프로토타입</title>
+<style>
+:root{font-family:"Malgun Gothic","Apple SD Gothic Neo",Arial,sans-serif;color:#1a2d43;background:#f3f6fa;font-size:14px}*{box-sizing:border-box}body{margin:0}header{background:#112e4c;color:white;padding:26px max(18px,calc((100vw - 1160px)/2))}header h1{font-size:24px;margin:0 0 9px}header p{margin:0;color:#cbd9e6;line-height:1.6}.strip{background:#e7f1f7;border-bottom:1px solid #c8dbea;color:#234765;padding:12px max(18px,calc((100vw - 1160px)/2));font-size:12px;line-height:1.6}main{max-width:1196px;margin:20px auto;padding:0 18px 64px}.panel{background:white;border:1px solid #dce5ef;border-radius:12px;padding:21px;margin-bottom:17px;box-shadow:0 3px 13px #29435a0a}.head{display:flex;align-items:center;gap:11px;margin-bottom:12px}.step{background:#e7eff8;color:#144e7a;border-radius:7px;padding:7px 10px;font-size:12px;font-weight:800;flex:none}.panel h2{margin:0;font-size:17px;color:#183958}.muted{color:#5e7589;font-size:12px;line-height:1.65}.intro{margin-top:0;line-height:1.65}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}.kpi{background:#eaf1f8;border-radius:9px;padding:14px 12px}.kpi small{display:block;color:#4c6983;font-weight:650}.kpi strong{display:block;font-size:22px;color:#123956;margin-top:6px}.ctrls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:14px 0}.field label{font-size:12px;font-weight:750;display:block;margin:0 0 6px;color:#2d4c66}.field input,.field select{width:100%;border:1px solid #afc4d7;border-radius:6px;padding:9px;background:white;color:#1a3652}.field input[type=checkbox]{width:auto;margin:0 6px 0 0;vertical-align:middle}.actions{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0}.btn{border:0;background:#187da8;color:white;padding:10px 14px;border-radius:7px;cursor:pointer;font-weight:750}.btn.secondary{background:#e6eff7;color:#234966;border:1px solid #bad0e0}.btn:disabled{opacity:.5}.pill{display:inline-block;background:#e6f0f8;color:#215577;border-radius:6px;font-size:12px;font-weight:650;padding:6px 9px;margin:3px}.callout{border-left:4px solid #288fac;background:#edf7fb;padding:12px 14px;border-radius:4px;line-height:1.65;margin:10px 0}.warning{border-left:4px solid #cb8c33;background:#fff6e9;padding:11px 14px;border-radius:4px;line-height:1.65;margin:10px 0}.tbl{overflow:auto;max-width:100%;border:1px solid #dce6ef;border-radius:8px}table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}td,th{border-bottom:1px solid #e5ecf2;padding:9px 10px;text-align:right}th{background:#e8f1f8;color:#28465d;position:sticky;top:0}th:first-child,td:first-child{text-align:left}tbody tr:hover{background:#f4f9fd}tr.recommended{background:#e8f5f0}input.mini{width:65px;border-radius:5px;border:1px solid #c0cedb;padding:5px;text-align:right}select.mini{border-radius:5px;border:1px solid #c0cedb;padding:5px}.detail{margin:8px 0 0}.rowscroll{max-height:300px}.bad{color:#ab3a31;font-weight:700}.ok{color:#08745d;font-weight:700}.status{font-size:12px;color:#175d78;margin:10px 0}.dim{opacity:.85}.small{font-size:11px}.columns{display:grid;grid-template-columns:1fr 1fr;gap:14px}.subsection{border:1px solid #dce6ef;border-radius:9px;padding:15px}.subsection h3{margin:0 0 12px;font-size:14px;color:#2c4c66}@media(max-width:920px){.ctrls,.kpis{grid-template-columns:repeat(2,1fr)}.columns{grid-template-columns:1fr}}@media(max-width:560px){.panel{padding:15px}.ctrls{grid-template-columns:1fr 1fr}header h1{font-size:20px}.kpi strong{font-size:19px}} 
+.product-table .group-main{background:#e7eff8;text-align:center;color:#28465d;font-weight:800}.product-table .group-special{background:#dfeff0;text-align:center;color:#156266;border-left:3px solid #6ba5a7;font-weight:800}.product-table .special-col{background:#f0f8f8}.product-table .special-total{background:#e6f3f1;color:#115a57;font-weight:800}.product-table td:nth-child(n+5){background:#f6fbfa}.product-table td:nth-child(5){border-left:3px solid #b6d4d3}.product-table td:nth-child(8){background:#eaf5f3;font-weight:800}.store-controls{grid-template-columns:repeat(3,minmax(0,1fr))}@media(max-width:560px){.store-controls{grid-template-columns:1fr}}
+</style></head><body>
+<header><h1>시즌 초도 재고 배분 의사결정 지원 프로토타입</h1><p>기획 아소트 입력 → 1차 PACK 구성 추천 → 매장 평가 → 2차 재최적화 → 최종 배분안</p></header>
+<div class="strip">AI 협업 개발 결과물 · 시연 데이터: <b>가상 5 ST / 11 SKU 및 가상 매장 85개</b> · 실제 회사 기획량·매출·매장정보 미사용 · 프로그램은 규칙 기반 탐색·배분 알고리즘으로 작동하며, ChatGPT는 개발 과정에 활용되었습니다.</div>
+<main>
+<section class="panel" id="stage1"><div class="head"><span class="step">STEP 01</span><h2>기초 데이터 및 배분 조건 입력</h2></div>
+<p class="intro">스타일·컬러·사이즈 단위 기획 아소트와 <b>별도 배정물량(수출·매각·마케팅)</b>을 입력합니다. <b>목표 배분율은 최초 기획수량 기준</b>이며, 별도 배정물량도 목표 배분량에 포함됩니다.</p>
+<div class="kpis"><div class="kpi"><small>스타일 (ST)</small><strong id="metricST">—</strong></div><div class="kpi"><small>컬러 SKU</small><strong id="metricSKU">—</strong></div><div class="kpi"><small>사이즈별 품목</small><strong id="metricSizes">—</strong></div><div class="kpi"><small>기획량 / 별도 배정량</small><strong id="metricPlan">—</strong></div></div>
+<div class="ctrls"><div class="field"><label for="target">목표 초도 배분율 (%)</label><input id="target" type="number" min="10" max="100" step="0.5" value="80"></div><div class="field"><label for="mode">배분 전략</label><select id="mode"><option value="coverage">최대한 많은 매장에 배분</option><option value="assortment">매장당 다양한 사이즈 구색 확보</option></select></div></div>
+<p class="muted">1차 추천은 <b>매장 실적과 관계없이 상품별 사이즈 재고를 기준으로</b> 진행합니다. 상품별 재고량에 따라 계산 범위를 자동 설정하며, 실제 매장 평가 후 최종 PACK 구성을 다시 계산합니다.</p>
+<div class="actions"><button class="btn" id="recalculate">1차 추천부터 최종 배분안까지 계산</button><button class="btn secondary" id="reset">샘플 데이터로 초기화</button><button class="btn secondary" id="productExport">상품 데이터 엑셀용 파일 저장</button><button class="btn secondary" id="productImport">상품 데이터 파일 불러오기</button><input id="productFile" type="file" accept=".csv,text/csv" hidden></div>
+<div class="status" id="status" aria-live="polite"></div>
+<div class="tbl rowscroll"><table class="product-table"><thead><tr><th colspan="4" class="group-main">기획 상품 정보</th><th colspan="4" class="group-special">별도 배정분 · 일반 매장 배분 외 물량</th></tr><tr><th>ST</th><th>컬러</th><th>사이즈</th><th>기획수량 (PCS)</th><th class="special-col">수출</th><th class="special-col">매각</th><th class="special-col">마케팅</th><th class="special-total">별도 배정분 합계</th></tr></thead><tbody id="productRows"></tbody></table></div>
+<p class="muted">ST=스타일, SKU=스타일×컬러, 사이즈별 품목=스타일×컬러×사이즈. 별도 배정분은 수출·매각·마케팅 물량을 합산해 표시합니다. CSV는 엑셀에서 열고 편집할 수 있는 파일 형식입니다. 본 시범 버전은 사이즈별 품목 300개 이하를 대상으로 합니다.</p><p class="muted"><b>시범용 상품 유형:</b> TEST-S01 날개 사이즈 충분 · S02 균형형 · S03 날개 사이즈 부족 · S04 중심 사이즈 집중 · S05 소량 기획. 모두 가상 데이터입니다.</p>
+</section>
+<section class="panel" id="stage2"><div class="head"><span class="step">STEP 02</span><h2>1차 추천: 재고 기반 총 PACK 개수 및 등급별 PACK 개수 잠정 구성</h2></div><p class="intro">상품별 사이즈 LOT와 목표 배분율을 기준으로 <b>총 PACK 개수와 B1·BA·BB·BC·BD 등급별 PACK 개수를 동시에 탐색</b>합니다. 현재 단계에는 매장 평가를 반영하지 않습니다.</p>
+<div class="kpis"><div class="kpi"><small>잠정 총 PACK 개수</small><strong id="firstCount">—</strong></div><div class="kpi"><small>잠정 배분율</small><strong id="firstRate">—</strong></div><div class="kpi"><small>상위등급(B1·BA) 구색</small><strong id="firstUpper">—</strong></div><div class="kpi"><small>잠정 잔여 수량</small><strong id="firstRemain">—</strong></div></div>
+<div class="tbl"><table><thead><tr><th>구분</th><th>B1</th><th>BA</th><th>BB</th><th>BC</th><th>BD</th><th>총 PACK 개수</th><th>총 배분율</th><th>상위(B1·BA) 사이즈 구색</th><th>하위(BC·BD) 사이즈 구색</th></tr></thead><tbody id="firstComparison"></tbody></table></div>
+<div id="firstNarrative" class="callout">1차 추천 결과가 표시됩니다.</div>
+</section>
+<section class="panel" id="stage3"><div class="head"><span class="step">STEP 03</span><h2>매장 평가 및 배분 우선순위 결정</h2></div>
+<p class="intro">전년 동시즌 신상품 매출, 매장 면적, 본사 협조도를 100점 기준으로 환산한 뒤 가중치를 적용합니다. <b>평가점수가 높은 매장부터 순위를 정하고</b>, STEP 04의 최종 PACK 개수에 따라 B1 → BA → BB → BC → BD 순서로 등급을 부여합니다.</p>
+<div class="warning"><b>현재 매장 85개는 모두 가상 데이터입니다.</b> 가중치는 시연용 기본값이며, 실제 매장별 점수와 등급은 운영 담당자의 확인이 필요합니다.</div>
+<div class="ctrls store-controls"><div class="field"><label for="salesWeight">신상품 매출 가중치 (%)</label><input id="salesWeight" type="number" min="0" max="100" value="60"></div><div class="field"><label for="areaWeight">매장 평수 가중치 (%)</label><input id="areaWeight" type="number" min="0" max="100" value="20"></div><div class="field"><label for="coopWeight">본사 협조도 가중치 (%)</label><input id="coopWeight" type="number" min="0" max="100" value="20"></div></div>
+<p class="muted">가중치 합계 100%. 매출과 평수는 후보 매장의 최솟값을 0점, 최댓값을 100점으로 환산합니다. 협조도는 1점→0점, 5점→100점입니다. <b>신상품 매출 입력 단위는 백만원, 평가 기간은 전년 동시즌을 가정</b>합니다. '정성 보정'은 매장별 최종 평가점수에 직접 더하거나 빼는 값입니다.</p>
+<div class="actions"><button class="btn secondary" id="evaluate">매장 재평가 + 최종 배분안 재계산</button><button class="btn secondary" id="storeExport">매장 데이터 엑셀용 파일 저장</button><button class="btn secondary" id="storeImport">매장 데이터 파일 불러오기</button><button class="btn secondary" id="selectionExport">매장 선정 결과 엑셀용 파일 저장</button><input id="storeFile" type="file" accept=".csv,text/csv" hidden></div>
+<div id="caps" class="detail"></div><div class="tbl rowscroll"><table><thead><tr><th>가상 매장</th><th>전년 신상품 매출 (백만원)</th><th>면적 (평)</th><th>협조도 (1~5점)</th><th>정성 보정 (±점)</th><th>배분 대상</th><th>평가점수</th><th>평가순위</th><th>최종등급</th><th>초도배분</th></tr></thead><tbody id="storeRows"></tbody></table></div><p id="storeStatus" class="muted"></p>
+</section>
+
+<section class="panel" id="stage4"><div class="head"><span class="step">STEP 04</span><h2>2차 추천: 매장 평가를 반영한 최종 PACK 재최적화</h2></div><p class="intro">실제 배분 후보 매장 수를 상한으로 하여 <b>총 PACK 개수와 등급별 PACK 개수를 다시 계산</b>합니다. 점수 순으로 매장에 등급을 배정하며, 운영 가능 매장 수가 부족하면 총 PACK 개수와 등급별 PACK 개수를 재조정합니다.</p>
+<div class="kpis"><div class="kpi"><small>최종 추천 총 PACK 개수</small><strong id="finalCount">—</strong></div><div class="kpi"><small>최종 추천 배분율</small><strong id="finalRate">—</strong></div><div class="kpi"><small>초도 선정 / 대상 후보</small><strong id="selectedCount">—</strong></div><div class="kpi"><small>재고 초과 건수</small><strong id="violationCount">—</strong></div></div>
+<div class="tbl"><table><thead><tr><th>구분</th><th>B1</th><th>BA</th><th>BB</th><th>BC</th><th>BD</th><th>총 PACK 개수</th><th>배분율</th><th>상위(B1·BA) 사이즈 구색</th><th>하위(BC·BD) 사이즈 구색</th></tr></thead><tbody id="finalComparison"></tbody></table></div>
+<div id="finalNarrative" class="callout">최종 추천 결과가 표시됩니다.</div>
+</section>
+<section class="panel" id="stage5"><div class="head"><span class="step">STEP 05</span><h2>최종 사이즈 아소트 및 배분 결과 검증</h2></div><p class="muted">각 등급 1개 매장에 투입되는 아소트 수량입니다. B1 → BA → BB → BC → BD 우선순위를 적용하며, 재고를 초과하지 않는 정수 수량만 배분합니다. 하위등급은 일부 사이즈가 누락될 수 있습니다.</p>
+<div class="tbl"><table><thead><tr><th>등급</th><th>PACK</th><th>ST 확보</th><th>SKU 확보</th><th>사이즈 구색</th><th>배분 수량 (PCS)</th></tr></thead><tbody id="gradeRows"></tbody></table></div>
+<div id="checks" class="detail"></div><div class="actions"><button class="btn secondary" id="allocationExport">최종 배분안 엑셀용 파일 저장</button><button class="btn secondary" id="copyPrompt">ChatGPT 추가 검토 프롬프트 복사</button></div>
+<div class="tbl rowscroll"><table><thead><tr><th>ST</th><th>컬러</th><th>사이즈</th><th>기획량</th><th>별도 배정</th><th>B1/매장</th><th>BA/매장</th><th>BB/매장</th><th>BC/매장</th><th>BD/매장</th><th>전체 배분</th><th>잔여</th></tr></thead><tbody id="allocationRows"></tbody></table></div>
+<div class="warning"><b>모델의 한계:</b> 현재 입력한 상품·매장 데이터는 모두 가상이며, 실매장 수요·예상 판매량은 구현 범위에 포함되지 않았습니다. 컬러 간 사이즈를 상호 보완하는 배분 방식은 향후 고도화 과제로 남겨두었습니다. 따라서 본 결과는 가상 데이터 기반의 검증용 추천 후보입니다. 프로그램은 규칙 기반 탐색·배분 알고리즘으로 작동하며, ChatGPT는 문제 정의·제약조건 설계·프로그램 구현·결과 검토에 활용했습니다.</div>
+</section></main>
+<script>
+'use strict';
+const ORIGINAL_STORES=[{"store_id":"TEST-001","new_sales":40.0,"area":26,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-002","new_sales":82.3,"area":63,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-003","new_sales":124.6,"area":35,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-004","new_sales":73.9,"area":72,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-005","new_sales":116.2,"area":44,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-006","new_sales":59.0,"area":81,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-007","new_sales":101.3,"area":53,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-008","new_sales":50.6,"area":90,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-009","new_sales":92.9,"area":62,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-010","new_sales":135.2,"area":34,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-011","new_sales":78.0,"area":71,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-012","new_sales":120.3,"area":43,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-013","new_sales":69.6,"area":80,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-014","new_sales":111.9,"area":52,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-015","new_sales":61.2,"area":89,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-016","new_sales":97.0,"area":61,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-017","new_sales":63.3,"area":25,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-018","new_sales":105.6,"area":62,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-019","new_sales":147.9,"area":34,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-020","new_sales":97.2,"area":71,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-021","new_sales":133.0,"area":43,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-022","new_sales":82.3,"area":80,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-023","new_sales":124.6,"area":52,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-024","new_sales":73.9,"area":24,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-025","new_sales":116.2,"area":61,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-026","new_sales":59.0,"area":33,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-027","new_sales":101.3,"area":70,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-028","new_sales":143.6,"area":42,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-029","new_sales":92.9,"area":79,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-030","new_sales":135.2,"area":51,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-031","new_sales":78.0,"area":23,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-032","new_sales":120.3,"area":60,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-033","new_sales":69.6,"area":32,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-034","new_sales":111.9,"area":69,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-035","new_sales":154.2,"area":41,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-036","new_sales":97.0,"area":78,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-037","new_sales":139.3,"area":50,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-038","new_sales":88.6,"area":22,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-039","new_sales":130.9,"area":59,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-040","new_sales":80.2,"area":31,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-041","new_sales":116.0,"area":68,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-042","new_sales":65.3,"area":40,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-043","new_sales":107.6,"area":77,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-044","new_sales":149.9,"area":49,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-045","new_sales":99.2,"area":21,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-046","new_sales":135.0,"area":58,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-047","new_sales":84.3,"area":30,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-048","new_sales":126.6,"area":67,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-049","new_sales":75.9,"area":39,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-050","new_sales":118.2,"area":76,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-051","new_sales":61.0,"area":48,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-052","new_sales":103.3,"area":20,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-053","new_sales":145.6,"area":57,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-054","new_sales":94.9,"area":29,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-055","new_sales":137.2,"area":66,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-056","new_sales":80.0,"area":38,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-057","new_sales":122.3,"area":75,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-058","new_sales":71.6,"area":47,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-059","new_sales":113.9,"area":19,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-060","new_sales":53.2,"area":56,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-061","new_sales":89.0,"area":28,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-062","new_sales":131.3,"area":65,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-063","new_sales":80.6,"area":37,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-064","new_sales":122.9,"area":74,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-065","new_sales":72.2,"area":46,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-066","new_sales":108.0,"area":18,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-067","new_sales":57.3,"area":55,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-068","new_sales":99.6,"area":27,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-069","new_sales":141.9,"area":64,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-070","new_sales":91.2,"area":36,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-071","new_sales":127.0,"area":73,"cooperation":4,"adjustment":0,"eligible":true},{"store_id":"TEST-072","new_sales":76.3,"area":45,"cooperation":1,"adjustment":0,"eligible":true},{"store_id":"TEST-073","new_sales":118.6,"area":82,"cooperation":3,"adjustment":0,"eligible":true},{"store_id":"TEST-074","new_sales":67.9,"area":54,"cooperation":5,"adjustment":0,"eligible":true},{"store_id":"TEST-075","new_sales":110.2,"area":26,"cooperation":2,"adjustment":0,"eligible":true},{"store_id":"TEST-076","new_sales":37.0,"area":63,"cooperation":4,"adjustment":0,"eligible":false},{"store_id":"TEST-077","new_sales":79.3,"area":35,"cooperation":1,"adjustment":0,"eligible":false},{"store_id":"TEST-078","new_sales":121.6,"area":72,"cooperation":3,"adjustment":0,"eligible":false},{"store_id":"TEST-079","new_sales":70.9,"area":44,"cooperation":5,"adjustment":0,"eligible":false},{"store_id":"TEST-080","new_sales":113.2,"area":81,"cooperation":2,"adjustment":0,"eligible":false},{"store_id":"TEST-081","new_sales":56.0,"area":53,"cooperation":4,"adjustment":0,"eligible":false},{"store_id":"TEST-082","new_sales":98.3,"area":25,"cooperation":1,"adjustment":0,"eligible":false},{"store_id":"TEST-083","new_sales":47.6,"area":62,"cooperation":3,"adjustment":0,"eligible":false},{"store_id":"TEST-084","new_sales":89.9,"area":34,"cooperation":5,"adjustment":0,"eligible":false},{"store_id":"TEST-085","new_sales":39.2,"area":71,"cooperation":2,"adjustment":0,"eligible":false}];
+const ORIGINAL_DATA=[{"style":"TEST-S01","color":"C1","size":"090","qty":69,"export":1,"sale":0,"marketing":0},{"style":"TEST-S01","color":"C1","size":"095","qty":113,"export":4,"sale":0,"marketing":0},{"style":"TEST-S01","color":"C1","size":"100","qty":109,"export":3,"sale":0,"marketing":0},{"style":"TEST-S01","color":"C1","size":"105","qty":84,"export":1,"sale":0,"marketing":0},{"style":"TEST-S01","color":"C2","size":"090","qty":76,"export":1,"sale":0,"marketing":2},{"style":"TEST-S01","color":"C2","size":"095","qty":97,"export":4,"sale":0,"marketing":0},{"style":"TEST-S01","color":"C2","size":"100","qty":135,"export":4,"sale":0,"marketing":0},{"style":"TEST-S01","color":"C2","size":"105","qty":89,"export":1,"sale":0,"marketing":0},{"style":"TEST-S02","color":"C1","size":"090","qty":84,"export":1,"sale":0,"marketing":0},{"style":"TEST-S02","color":"C1","size":"095","qty":144,"export":4,"sale":5,"marketing":0},{"style":"TEST-S02","color":"C1","size":"100","qty":123,"export":4,"sale":0,"marketing":0},{"style":"TEST-S02","color":"C1","size":"105","qty":92,"export":1,"sale":0,"marketing":0},{"style":"TEST-S02","color":"C2","size":"090","qty":75,"export":1,"sale":0,"marketing":0},{"style":"TEST-S02","color":"C2","size":"095","qty":117,"export":4,"sale":0,"marketing":0},{"style":"TEST-S02","color":"C2","size":"100","qty":123,"export":4,"sale":8,"marketing":0},{"style":"TEST-S02","color":"C2","size":"105","qty":72,"export":1,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C1","size":"090","qty":19,"export":1,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C1","size":"095","qty":145,"export":3,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C1","size":"100","qty":136,"export":3,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C1","size":"105","qty":17,"export":1,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C2","size":"090","qty":11,"export":1,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C2","size":"095","qty":157,"export":4,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C2","size":"100","qty":185,"export":3,"sale":0,"marketing":0},{"style":"TEST-S03","color":"C2","size":"105","qty":24,"export":1,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C1","size":"090","qty":26,"export":1,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C1","size":"095","qty":217,"export":5,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C1","size":"100","qty":263,"export":4,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C1","size":"105","qty":16,"export":1,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C2","size":"090","qty":34,"export":1,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C2","size":"095","qty":259,"export":5,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C2","size":"100","qty":236,"export":4,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C2","size":"105","qty":25,"export":1,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C3","size":"090","qty":17,"export":1,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C3","size":"095","qty":201,"export":6,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C3","size":"100","qty":192,"export":5,"sale":0,"marketing":0},{"style":"TEST-S04","color":"C3","size":"105","qty":32,"export":2,"sale":0,"marketing":2},{"style":"TEST-S05","color":"C1","size":"090","qty":15,"export":1,"sale":0,"marketing":0},{"style":"TEST-S05","color":"C1","size":"095","qty":131,"export":3,"sale":3,"marketing":0},{"style":"TEST-S05","color":"C1","size":"100","qty":105,"export":2,"sale":0,"marketing":0},{"style":"TEST-S05","color":"C1","size":"105","qty":11,"export":1,"sale":0,"marketing":0},{"style":"TEST-S05","color":"C2","size":"090","qty":19,"export":1,"sale":0,"marketing":0},{"style":"TEST-S05","color":"C2","size":"095","qty":118,"export":3,"sale":0,"marketing":0},{"style":"TEST-S05","color":"C2","size":"100","qty":97,"export":3,"sale":0,"marketing":0},{"style":"TEST-S05","color":"C2","size":"105","qty":7,"export":1,"sale":0,"marketing":0}];
+const LEVELS=['B1','BA','BB','BC','BD'];
+let products=ORIGINAL_DATA.map(x=>({...x}));
+let stores=ORIGINAL_STORES.map(x=>({...x}));
+let result=null;
+const $=id=>document.getElementById(id);
+const fmt=n=>Math.round(n).toLocaleString('ko-KR');
+const pct=v=>(v*100).toFixed(2)+'%';
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const special=r=>r.export+r.sale+r.marketing;
+const packsum=p=>p.reduce((a,b)=>a+b,0);
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function stats(rows){return {st:new Set(rows.map(r=>r.style)).size,sku:new Set(rows.map(r=>r.style+'|'+r.color)).size,items:rows.length,qty:rows.reduce((a,r)=>a+r.qty,0),special:rows.reduce((a,r)=>a+special(r),0)};}
+function annotated(rows){
+ const group=new Map();rows.forEach((r,i)=>{const k=r.style+'|'+r.color;if(!group.has(k))group.set(k,[]);group.get(k).push(i)});
+ const centers=new Set();for(const arr of group.values()){arr.sort((a,b)=>rows[b].qty-rows[a].qty).slice(0,Math.min(2,arr.length)).forEach(i=>centers.add(i))}
+ return rows.map((r,i)=>({...r,special:special(r),center:centers.has(i)}));
+}
+function inputConfig(){
+ const target=Number($('target').value)/100,mode=$('mode').value;
+ if(!Number.isFinite(target)||target<.10||target>1)throw Error('목표 배분율은 10~100%로 입력해 주세요.');
+ if(!['coverage','assortment'].includes(mode))throw Error('배분 전략을 확인해 주세요.');
+ // In-stock size distribution determines the exploratory bound; no user-set fixed PACK cap.
+ const net=products.map(r=>Math.max(0,r.qty-special(r))).sort((a,b)=>a-b);
+ const quantile=net[Math.min(net.length-1,Math.floor((net.length-1)*.40))]||0;
+ const maxTotal=Math.max(3,Math.min(180,Math.round(quantile*1.65)));
+ return {target,mode,maxTotal,maxCandidates:620};
+}
+function validateProducts(){
+ if(products.length===0||products.length>300)throw Error('사이즈별 품목 데이터는 1~300개로 입력해 주세요.');
+ const seen=new Set();
+ for(const r of products){
+  if(!r.style||!r.color||!r.size||!['qty','export','sale','marketing'].every(k=>Number.isInteger(r[k])&&r[k]>=0)||special(r)>r.qty)throw Error('상품 정보·기획수량·별도 배정 합계가 올바르지 않습니다.');
+  const key=[r.style,r.color,r.size].join('|');if(seen.has(key))throw Error('같은 ST·컬러·사이즈 행이 중복되어 있습니다.');seen.add(key);
+ }
+ if(products.every(r=>r.qty===0))throw Error('기획수량이 모두 0입니다.');
+}
+function productTable(){
+ const s=stats(products);$('metricST').textContent=fmt(s.st);$('metricSKU').textContent=fmt(s.sku);$('metricSizes').textContent=fmt(s.items);$('metricPlan').textContent=fmt(s.qty)+' / '+fmt(s.special)+' PCS';
+ $('productRows').innerHTML=products.map((r,i)=>`<tr><td>${esc(r.style)}</td><td>${esc(r.color)}</td><td>${esc(r.size)}</td>${['qty','export','sale','marketing'].map(k=>`<td><input class="mini" type="number" min="0" step="1" data-row="${i}" data-key="${k}" value="${r[k]}"></td>`).join('')}<td>${special(r)}</td></tr>`).join('');
+ $('productRows').querySelectorAll('input').forEach(el=>el.addEventListener('change',()=>{products[+el.dataset.row][el.dataset.key]=Number(el.value);el.closest('tr').lastElementChild.textContent=special(products[+el.dataset.row]);const st=stats(products);$('metricPlan').textContent=fmt(st.qty)+' / '+fmt(st.special)+' PCS';$('status').textContent='상품 입력값이 변경되었습니다. 재계산 버튼을 눌러 적용해 주세요.';}));
+}
+function evaluateStores(){
+ const weights=[Number($('salesWeight').value),Number($('areaWeight').value),Number($('coopWeight').value)];
+ if(weights.some(w=>!Number.isFinite(w)||w<0)||Math.abs(weights.reduce((a,b)=>a+b,0)-100)>.00001)throw Error('매장 평가 가중치의 합계는 100%여야 합니다.');
+ const ids=new Set();for(const r of stores){
+  if(!r.store_id||ids.has(r.store_id)||![r.new_sales,r.area,r.cooperation,r.adjustment].every(Number.isFinite)||r.new_sales<0||r.area<=0||r.cooperation<1||r.cooperation>5||r.adjustment< -20||r.adjustment>20)throw Error('매장 데이터의 ID·매출·면적·협조도·정성 보정을 확인해 주세요.');
+  ids.add(r.store_id);
+ }
+ const good=stores.filter(r=>r.eligible);if(good.length<1)throw Error('배분 대상 매장을 최소 1개 이상 선택해 주세요.');
+ const range=k=>[Math.min(...good.map(r=>r[k])),Math.max(...good.map(r=>r[k]))];
+ const [sl,sh]=range('new_sales'),[al,ah]=range('area');
+ const norm=(x,lo,hi)=>hi===lo?50:(x-lo)*100/(hi-lo);
+ const ranked=good.map(r=>({...r,score:clamp((weights[0]*norm(r.new_sales,sl,sh)+weights[1]*norm(r.area,al,ah)+weights[2]*(r.cooperation-1)*25)/100+r.adjustment,0,100)})).sort((a,b)=>b.score-a.score||a.store_id.localeCompare(b.store_id));
+ ranked.forEach((r,i)=>r.rank=i+1);
+ return {ranked,eligible:good.length,byId:new Map(ranked.map(r=>[r.store_id,r]))};
+}
+function assignmentMap(a,packs){
+ const byId=new Map(),counts=packsum(packs);let pos=0;
+ LEVELS.forEach((g,i)=>{for(let j=0;j<packs[i]&&pos<a.ranked.length;j++,pos++){byId.set(a.ranked[pos].store_id,{grade:g,selected:true,rank:pos+1});}});
+ for(let i=pos;i<a.ranked.length;i++)byId.set(a.ranked[i].store_id,{grade:'대기',selected:false,rank:i+1});
+ return byId;
+}
+function storeTable(a,packs){
+ const assigned=assignmentMap(a,packs);
+ $('caps').innerHTML=`<span class="pill">배분 후보 매장 ${a.eligible}개</span><span class="pill">추천 초도 배분 매장 ${packsum(packs)}개</span><span class="pill">대기 ${a.eligible-packsum(packs)}개</span>`;
+ $('storeRows').innerHTML=stores.map((r,i)=>{const e=a.byId.get(r.store_id),part=assigned.get(r.store_id);return `<tr><td>${esc(r.store_id)}</td>${['new_sales','area','cooperation','adjustment'].map(k=>`<td><input class="mini" type="number" step="1" data-row="${i}" data-key="${k}" value="${r[k]}"></td>`).join('')}<td><input type="checkbox" data-row="${i}" data-key="eligible" ${r.eligible?'checked':''}></td><td>${e?e.score.toFixed(1):'—'}</td><td>${e?e.rank:'—'}</td><td>${part?part.grade:'제외'}</td><td>${part?(part.selected?'<span class="ok">선정</span>':'<span class="bad">대기</span>'):'—'}</td></tr>`;}).join('');
+ $('storeRows').querySelectorAll('input').forEach(el=>el.addEventListener('change',()=>{const i=+el.dataset.row,k=el.dataset.key;stores[i][k]=k==='eligible'?el.checked:Number(el.value);$('storeStatus').textContent='매장 정보가 변경되었습니다. 재평가 버튼을 눌러 적용해 주세요.';}));
+ $('storeStatus').textContent=`배분 대상 ${a.eligible}개 · 선정 ${packsum(packs)}개 · 대기 ${a.eligible-packsum(packs)}개 · 제외 ${stores.length-a.eligible}개. 평가점수 상위 매장부터 최종 PACK 개수만큼 B1 → BA → BB → BC → BD 순서로 배정합니다.`;
+}
+function proportion(total,weights){
+ if(total<0)return null;
+ const count=[0,0,0,0,0];let base=0;
+ if(total>=1){count[0]++;base++;}if(total>=2){count[1]++;base++;}
+ if(total>=5){count[2]++;count[3]++;count[4]++;base+=3;}
+ if(total>=10){for(let i=0;i<5;i++)count[i]++;base+=5;}
+ const remaining=total-base;
+ if(remaining<0)return null;
+ const sum=weights.reduce((a,b)=>a+b,0),raw=weights.map(w=>w*remaining/sum);
+ const increments=raw.map(Math.floor);let left=remaining-packsum(increments);
+ const order=raw.map((x,i)=>({i,frac:x-increments[i]})).sort((a,b)=>b.frac-a.fr||a.i-b.i);
+ for(let j=0;j<left;j++)increments[order[j].i]++;
+ return count.map((x,i)=>x+increments[i]);
+}
+function candidatePacks(cfg,assessment){
+ const profiles=[[.12,.18,.27,.25,.18],[.14,.20,.24,.24,.18],[.16,.23,.24,.21,.16],[.20,.25,.22,.19,.14],[.10,.20,.24,.27,.19],[.09,.17,.24,.29,.21],[.18,.21,.22,.21,.18],[.11,.25,.26,.22,.16],[.21,.25,.20,.19,.15],[.13,.19,.23,.23,.22],[.25,.25,.20,.16,.14],[.09,.14,.25,.29,.23]];
+ const max=Math.min(cfg.maxTotal,assessment?assessment.eligible:cfg.maxTotal),min=Math.max(1,Math.floor(max*.38)),seen=new Map();
+ for(let t=min;t<=max;t+=2){
+  for(const profile of profiles){
+   const p=proportion(t,profile);if(!p)continue;seen.set(p.join(','),p);
+   for(let a=0;a<5;a++)for(let b=a+1;b<5;b++)for(const delta of [-2,2]){
+    const q=p.slice();q[a]+=delta;q[b]-=delta;
+    if(q.some(x=>x<0))continue;seen.set(q.join(','),q);
+   }
+  }
+ }
+ for(const profile of profiles){const p=proportion(max,profile);if(p)seen.set(p.join(','),p);}
+ const all=[...seen.values()];const limit=cfg.maxCandidates||620;
+ if(all.length<=limit)return all;
+ const chosen=[],used=new Set(),ordered=all.map((v,i)=>({v,i})).sort((a,b)=>packsum(a.v)-packsum(b.v)||a.i-b.i);
+ for(let i=0;i<limit;i++){const j=Math.floor(i*(ordered.length-1)/(limit-1));const q=ordered[j].v,k=q.join(',');if(!used.has(k)){used.add(k);chosen.push(q);}}
+ return chosen;
+}
+function allocate(rows,packs,target,mode){
+ const sum=rows.reduce((a,r)=>a+r.qty,0);const pre=rows.reduce((a,r)=>a+r.special,0);
+ const budget=Math.max(pre,Math.min(sum,Math.floor(target*sum+.005*sum)));
+ const out=rows.map(r=>({...r,assign:[0,0,0,0,0],remaining:r.qty-r.special}));
+ let used=pre,steps=0;
+ while(++steps<100000){let best=-Infinity,bi=-1,bg=-1;
+  for(let i=0;i<out.length;i++){const r=out[i],maxes=r.center?[5,4,3,2,2]:[3,2,1,1,1];
+   for(let g=0;g<5;g++){const x=r.assign[g],cost=packs[g];if(cost<=0||x>=maxes[g]||cost>r.remaining||used+cost>budget)continue;
+    if(g>0&&x>=r.assign[g-1])continue;if(g===0&&x-r.assign[1]>=2)continue;
+    const first=x===0;let benefit=first?(mode==='assortment'?[125,115,73,57,50][g]:[115,108,65,55,50][g]):(mode==='assortment'?[21,19,9,7,6][g]:[18,16,9,8,7][g]);
+    if(!first)benefit*=r.center?1.3:.65;if(first&&g>=2&&!r.center)benefit*=1.14;
+    const score=benefit/Math.sqrt(cost)+(rows.length-i)*0.000001;
+    if(score>best){best=score;bi=i;bg=g;}
+   }
+  }
+  if(bi<0)break;
+  out[bi].assign[bg]++;out[bi].remaining-=packs[bg];used+=packs[bg];
+ }
+ const stTotal=new Set(rows.map(r=>r.style)).size,skuTotal=new Set(rows.map(r=>r.style+'|'+r.color)).size;
+ const grade=LEVELS.map((_,g)=>{const active=out.filter(r=>r.assign[g]>0);return {packs:packs[g],st:new Set(active.map(r=>r.style)).size,sku:new Set(active.map(r=>r.style+'|'+r.color)).size,size:active.length,qty:out.reduce((a,r)=>a+r.assign[g]*packs[g],0)};});
+ const rate=used/sum,upper=(grade[0].size+grade[1].size)/(2*out.length),lower=(grade[3].size+grade[4].size)/(2*out.length);
+ const invFail=out.reduce((a,r)=>a+(r.remaining<0?1:0)+r.assign.reduce((b,x,g)=>b+(g>0&&x>r.assign[g-1]?1:0),0),0);
+ return {packs,out,grade,sum,pre,rate,upper,lower,remaining:sum-used,used,invFail,stTotal,skuTotal};
+}
+function scoreModel(r,cfg,assessment){
+ // Stock assortment, number of served stores and target-rate fit are scored without store-sales predictions.
+ const reach=Math.min(1,packsum(r.packs)/Math.max(1,cfg.maxTotal));
+ const closeness=Math.max(0,1-Math.abs(r.rate-cfg.target)/.06);
+ const assortment=(r.grade[3].st+r.grade[4].st)/(2*Math.max(1,r.stTotal))*.5+(r.grade[3].sku+r.grade[4].sku)/(2*Math.max(1,r.skuTotal))*.5;
+ let score=cfg.mode==='assortment'?(26*reach+37*r.upper+23*r.lower+11*closeness+3*assortment):(42*reach+27*r.upper+16*r.lower+12*closeness+3*assortment);
+ score-=75*Math.max(0,.90-r.upper);score-=35*Math.max(0,.18-r.lower);
+ // Do not call pack assignments valid if selected stores receive zero pieces.
+ r.grade.forEach((g,i)=>{if(r.packs[i]>0&&g.qty<=0)score-=35;});
+ if(assessment&&packsum(r.packs)>assessment.eligible)score-=1000;
+ return Math.round(score*100)/100;
+}
+function optimize(data,cfg,assessment){
+ const space=candidatePacks(cfg,assessment),results=[];
+ for(const p of space){const r=allocate(data,p,cfg.target,cfg.mode);r.score=scoreModel(r,cfg,assessment);results.push(r);}
+ results.sort((x,y)=>y.score-x.score||Math.abs(x.rate-cfg.target)-Math.abs(y.rate-cfg.target)||packsum(y.packs)-packsum(x.packs));
+ if(!results.length)throw Error('추천할 PACK 조합을 찾지 못했습니다. 상품 수량과 대상 매장 수를 확인해 주세요.');
+ return {best:results[0],count:results.length,alternatives:results.slice(1,4)};
+}
+function packRow(label,r,highlight=false){return `<tr ${highlight?'class="recommended"':''}><td><b>${label}</b></td>${r.packs.map(v=>`<td>${v}</td>`).join('')}<td>${packsum(r.packs)}</td><td>${pct(r.rate)}</td><td>${pct(r.upper)}</td><td>${pct(r.lower)}</td></tr>`;}
+function renderAll(){
+ if(!result)return;const {cfg,s,first,final,assessment}=result;
+ const p=first.best,f=final.best;
+ $('firstCount').textContent=fmt(packsum(p.packs))+'팩';$('finalCount').textContent=fmt(packsum(f.packs))+'팩';
+ $('firstRate').textContent=pct(p.rate);$('firstUpper').textContent=pct(p.upper);$('firstRemain').textContent=fmt(p.remaining)+' PCS';
+ $('firstComparison').innerHTML=packRow('1차 잠정 추천',p,true)+first.alternatives.slice(0,2).map((r,i)=>packRow('대안 '+(i+1),r)).join('');
+ $('firstNarrative').innerHTML=`<b>재고만을 기준으로 추천:</b> ${LEVELS.map((g,i)=>`${g} ${p.packs[i]}팩`).join(' · ')}. 총 ${packsum(p.packs)}팩, 초도 배분율 ${pct(p.rate)}입니다. <b>매장 평가점수는 이 단계의 계산에 반영되지 않습니다.</b>`;
+ $('finalRate').textContent=pct(f.rate);$('selectedCount').textContent=`${packsum(f.packs)} / ${assessment.eligible}`;$('violationCount').textContent=fmt(f.invFail)+'건';
+ const feasibleFirst=packsum(p.packs)<=assessment.eligible;
+ $('finalComparison').innerHTML=packRow(feasibleFirst?'1차 잠정 구성':'1차 잠정 구성 (매장 수 초과)',p)+packRow('2차 최종 추천',f,true)+final.alternatives.slice(0,2).map((r,i)=>packRow('최종 대안 '+(i+1),r)).join('');
+ const diff=LEVELS.map((g,i)=>`${g} ${f.packs[i]-p.packs[i]>=0?'+':''}${f.packs[i]-p.packs[i]}`).join(' · ');
+ const warnings=[];
+ if(!feasibleFirst)warnings.push('1차 추천 PACK 개수가 배분 후보 매장 수를 초과해 재계산했습니다.');
+ if(f.upper<.80)warnings.push('B1·BA등급의 사이즈 구색 확보율이 80% 미만입니다.');
+ if(f.lower<.15)warnings.push('BC·BD등급의 사이즈 구색 확보율이 15% 미만입니다.');
+ if(Math.abs(f.rate-cfg.target)>.02)warnings.push('초도 배분율이 목표와 2%p 이상 차이 납니다.');
+ $('finalNarrative').innerHTML=`<b>최종 추천:</b> ${LEVELS.map((g,i)=>`${g} ${f.packs[i]}팩`).join(' · ')}. 1차 대비 조정: ${diff}. 배분 후보 ${assessment.eligible}개 매장 중 ${packsum(f.packs)}개를 선정합니다. ${warnings.length?'<b>추가 검토:</b> '+warnings.join(' '):'주요 수량 제약을 만족했습니다.'} <b>시뮬레이션 추천안이며 실제 최적 결과는 별도 검증이 필요합니다.</b>`;
+ storeTable(assessment,f.packs);
+ $('gradeRows').innerHTML=f.grade.map((g,i)=>`<tr><td>${LEVELS[i]}</td><td>${g.packs}</td><td>${g.st}/${s.st}</td><td>${g.sku}/${s.sku}</td><td>${g.size}/${s.items} (${pct(g.size/s.items)})</td><td>${fmt(g.qty)}</td></tr>`).join('');
+ const checks=[['재고 초과 없음',f.invFail===0],['배분 매장 수 제한 충족',packsum(f.packs)<=assessment.eligible],['목표 배분율 ±2%p',Math.abs(f.rate-cfg.target)<=.02],['상위등급(B1·BA) 구색 80% 이상',f.upper>=.80],['하위등급(BC·BD) 구색 15% 이상',f.lower>=.15],['실제 매장 수요 반영',false],['컬러 간 사이즈 교차 배분 최적화',false]];
+ $('checks').innerHTML=checks.map(([name,ok])=>`<span class="pill" style="background:${ok?'#e7f3ed':'#fff0e4'};color:${ok?'#217356':'#985818'}">${ok?'✓':'!'} ${name}</span>`).join('');
+ $('allocationRows').innerHTML=f.out.map(r=>`<tr><td>${esc(r.style)}</td><td>${esc(r.color)}</td><td>${esc(r.size)}</td><td>${r.qty}</td><td>${r.special}</td>${r.assign.map(v=>`<td>${v}</td>`).join('')}<td>${r.qty-r.remaining}</td><td class="${r.remaining<0?'bad':''}">${r.remaining}</td></tr>`).join('');
+ $('status').textContent=`계산 완료: 1차 ${first.count.toLocaleString('ko-KR')}개 후보 · 2차 ${final.count.toLocaleString('ko-KR')}개 후보 비교. 가상 상품 ${s.st} ST · ${s.sku} SKU · ${s.items}개 사이즈별 품목과 가상 매장 ${assessment.eligible}개 후보를 적용했습니다.`;
+}
+function run(){
+ try{const cfg=inputConfig();validateProducts();const data=annotated(products);const first=optimize(data,cfg,null);const assessment=evaluateStores();const final=optimize(data,cfg,assessment);result={cfg,s:stats(products),first,final,assessment};renderAll();}
+ catch(e){result=null;$('status').textContent='입력 또는 계산 오류: '+e.message;console.error(e);}
+}
+function csvCell(v){const s=String(v);return /[",\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}
+function saveCSV(data,name){const txt='\uFEFF'+data.map(r=>r.map(csvCell).join(',')).join('\r\n');const blob=new Blob([txt],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function parseCSV(txt){txt=txt.replace(/^\uFEFF/,'');let rows=[],row=[],cell='',quoted=false;for(let i=0;i<txt.length;i++){const c=txt[i];if(c==='"'){if(quoted&&txt[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;}else if(c===','&&!quoted){row.push(cell);cell='';}else if((c==='\n'||c==='\r')&&!quoted){if(c==='\r'&&txt[i+1]==='\n')i++;row.push(cell);if(row.some(x=>x.length))rows.push([...row]);row=[];cell='';}else cell+=c;}row.push(cell);if(row.some(x=>x.length))rows.push([...row]);return rows;}
+function parseTable(text,fields){const rows=parseCSV(text),head=(rows.shift()||[]).map(x=>x.trim().toLowerCase());if(fields.some(f=>!head.includes(f)))throw Error('CSV 헤더는 '+fields.join(',')+' 형태여야 합니다.');return rows.map(row=>Object.fromEntries(fields.map(f=>[f,row[head.indexOf(f)]??''])));}
+function aiPrompt(){if(!result)return '';const {cfg,first,final,assessment,s}=result;return `다음 가상 초도배분 검증결과를 비판적으로 검토해 주세요. 실제 성과인 것처럼 표현하지 말고 숫자 계산과 실무 가정의 한계를 구분해 주세요.\n${JSON.stringify({scope:'가상 상품 5 ST·가상 매장 85개 기반 시범 모델',data_summary:s,goal:cfg.target,stage1_pack:first.best.packs,stage1_rate:first.best.rate,eligible_store_count:assessment.eligible,stage2_pack:final.best.packs,stage2_rate:final.best.rate,stage2_assortment:{upper:final.best.upper,lower:final.best.lower},stock_violations:final.best.invFail,method:'ChatGPT 협업 개발·규칙 기반 탐색(프로그램 내 생성형 AI 미탑재)'},null,2)}`;}
+function init(){
+ productTable();
+ $('recalculate').onclick=run;$('evaluate').onclick=run;
+ $('reset').onclick=()=>{products=ORIGINAL_DATA.map(x=>({...x}));stores=ORIGINAL_STORES.map(x=>({...x}));$('target').value=80;$('mode').value='coverage';$('salesWeight').value=60;$('areaWeight').value=20;$('coopWeight').value=20;productTable();run();};
+ $('productExport').onclick=()=>saveCSV([['style','color','size','qty','export','sale','marketing'],...products.map(r=>[r.style,r.color,r.size,r.qty,r.export,r.sale,r.marketing])],'sample_product_inputs.csv');
+ $('productImport').onclick=()=>$('productFile').click();
+ $('productFile').onchange=async(e)=>{const f=e.target.files[0];if(!f)return;try{const rows=parseTable(await f.text(),['style','color','size','qty','export','sale','marketing']);if(rows.length<1||rows.length>300)throw Error('사이즈별 품목은 1~300개 사이여야 합니다.');products=rows.map(r=>({...r,qty:Number(r.qty),export:Number(r.export),sale:Number(r.sale),marketing:Number(r.marketing)}));productTable();run();}catch(err){$('status').textContent='상품 CSV 오류: '+err.message;}e.target.value='';};
+ $('storeExport').onclick=()=>saveCSV([['store_id','new_sales','area','cooperation','adjustment','eligible'],...stores.map(r=>[r.store_id,r.new_sales,r.area,r.cooperation,r.adjustment,r.eligible?1:0])],'sample_store_inputs.csv');
+ $('storeImport').onclick=()=>$('storeFile').click();
+ $('storeFile').onchange=async(e)=>{const f=e.target.files[0];if(!f)return;try{const rows=parseTable(await f.text(),['store_id','new_sales','area','cooperation','adjustment','eligible']);if(rows.length<1||rows.length>300)throw Error('매장 데이터는 1~300개 사이여야 합니다.');stores=rows.map(r=>({...r,new_sales:Number(r.new_sales),area:Number(r.area),cooperation:Number(r.cooperation),adjustment:Number(r.adjustment),eligible:['1','true','y','yes'].includes(String(r.eligible).toLowerCase())}));run();}catch(err){$('status').textContent='매장 CSV 오류: '+err.message;}e.target.value='';};
+ $('selectionExport').onclick=()=>{if(!result)return;const a=result.assessment,assigned=assignmentMap(a,result.final.best.packs);saveCSV([['store_id','rank','grade','score','selected'],...stores.map(r=>{const x=a.byId.get(r.store_id),y=assigned.get(r.store_id);return [r.store_id,x?x.rank:'',y?y.grade:'제외',x?x.score.toFixed(1):'',y&&y.selected?'Y':'N'];})],'final_store_selection.csv');};
+ $('allocationExport').onclick=()=>{if(!result)return;saveCSV([['style','color','size','qty','special','B1_each','BA_each','BB_each','BC_each','BD_each','allocated','remaining'],...result.final.best.out.map(r=>[r.style,r.color,r.size,r.qty,r.special,...r.assign,r.qty-r.remaining,r.remaining])],'final_allocation_test.csv');};
+ $('copyPrompt').onclick=async()=>{if(!result)return;try{await navigator.clipboard.writeText(aiPrompt());$('status').textContent='ChatGPT 검토 프롬프트를 복사했습니다.';}catch(e){const x=document.createElement('textarea');x.value=aiPrompt();document.body.append(x);x.select();document.execCommand('copy');x.remove();$('status').textContent='ChatGPT 검토 프롬프트 복사를 시도했습니다.';}};
+ run();
+}
+init();
+</script></body></html>
